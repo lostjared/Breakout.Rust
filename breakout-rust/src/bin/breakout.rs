@@ -4,6 +4,7 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::rect::Rect;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 fn main() {
     let width = 1440;
@@ -30,7 +31,8 @@ fn main() {
 
     let mut breakout = Breakout::new();
     breakout.new_game();
-
+    let mut prev_tick = 0;
+    let mut tick_count = 0;
     'main: loop {
         for _event in e.poll_iter() {
             match _event {
@@ -42,6 +44,7 @@ fn main() {
                 _ => {}
             }
         }
+
         can.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
         can.clear();
         //can.copy(&texture, None, Some(Rect::new(0, 0, width, height))).expect("on copy");
@@ -52,9 +55,39 @@ fn main() {
                 let ypos = y * 16;
                 let color = Grid::color_from_type(&breakout.grid.blocks[x][y]);
                 can.set_draw_color(color);
-                can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16)).expect("draw rect");
+                can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
+                    .expect("draw rect");
             }
         }
+
+        let xpos = breakout.paddle.x;
+        let ypos = breakout.paddle.y;
+        can.set_draw_color(breakout.paddle.color);
+        can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 200, 20))
+            .expect("on fill");
+        let xpos = breakout.ball.x;
+        let ypos = breakout.ball.y;
+        can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 16, 16))
+            .expect("on ball");
         can.present();
+
+        let start = SystemTime::now();
+        let se = start.duration_since(UNIX_EPOCH).expect("error on time");
+        let tick = se.as_secs() * 1000 + se.subsec_nanos() as u64 / 1_000_000;
+        let ptick = tick - prev_tick;
+        prev_tick = tick;
+        tick_count += ptick;
+
+        if tick_count > 10 {
+            breakout.update();
+            tick_count = 0;
+            let keyboard_state = e.keyboard_state();
+            if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
+                breakout.paddle.move_left();
+            }
+            if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
+                breakout.paddle.move_right();
+            }
+        }
     }
 }
