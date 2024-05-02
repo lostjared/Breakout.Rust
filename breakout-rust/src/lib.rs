@@ -144,7 +144,7 @@ pub mod breakout {
                 && self.x <= paddle.x + PADDLE_WIDTH
             {
                 self.dy = -self.dy;
-            } else if self.y + BALL_SIZE > SCREEN_HEIGHT {
+            } else if self.y + BALL_SIZE > paddle.y + BALL_SIZE {
                 std::thread::sleep(std::time::Duration::from_secs(1));
                 *lives -= 1;
                 self.reset();
