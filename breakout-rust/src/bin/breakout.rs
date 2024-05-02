@@ -47,14 +47,14 @@ fn main() {
         .map_err(|e| e.to_string())
         .expect("Error on canvas");
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string()).unwrap();
-    let font = ttf_context.load_font("./font.ttf", 32).unwrap();
+    let font = ttf_context.load_font("./img/font.ttf", 32).unwrap();
     let tc = can.texture_creator();
     let _texture = tc
         .create_texture_streaming(PixelFormatEnum::RGB24, width, height)
         .map_err(|e| e.to_string())
         .expect("Error on texture create");
     let mut e = sdl.event_pump().unwrap();
-    let intro_surface = sdl2::surface::Surface::load_bmp("./logo.bmp").unwrap();
+    let intro_surface = sdl2::surface::Surface::load_bmp("./img/logo.bmp").unwrap();
     let intro_texture = tc.create_texture_from_surface(intro_surface).unwrap();
     let mut breakout = Breakout::new();
     breakout.new_game();
