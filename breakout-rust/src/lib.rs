@@ -139,7 +139,7 @@ pub mod breakout {
             self.dy = -BALL_SPEED;
         }
 
-        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid) {
+        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, mut score: &mut u32) {
             self.x += self.dx;
             self.y += self.dy;
 
@@ -168,6 +168,7 @@ pub mod breakout {
 
             for col in 0..TILE_W {
                 for row in 0..TILE_H {
+                    if grid.blocks[col][row].color_type == 0 { continue; }
                     let block_x = col as i32 * 32;
                     let block_y = row as i32 * 16;
                     let block_right = block_x + 32;
@@ -179,6 +180,7 @@ pub mod breakout {
                     {
                         self.dy = -self.dy;
                         grid.blocks[col][row].color_type = 0;
+                        *score += 10;
                     }
                 }
             }
@@ -207,7 +209,7 @@ pub mod breakout {
         }
 
         pub fn update(&mut self) {
-            self.ball.update(&self.paddle, &mut self.grid);
+            self.ball.update(&self.paddle, &mut self.grid, &mut self.score);
         }
     }
 }

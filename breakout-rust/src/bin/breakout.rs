@@ -4,7 +4,32 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::rect::Rect;
+use sdl2::render::TextureQuery;
 use std::time::{SystemTime, UNIX_EPOCH};
+
+fn printtext(
+    can: &mut sdl2::render::Canvas<sdl2::video::Window>,
+    tex: &sdl2::render::TextureCreator<sdl2::video::WindowContext>,
+    font: &sdl2::ttf::Font,
+    x: i32,
+    y: i32,
+    color: sdl2::pixels::Color,
+    text: &str,
+) {
+    let text_surf = font.render(text).blended(color).unwrap();
+    let text_surf_tex = tex.create_texture_from_surface(&text_surf).unwrap();
+    let TextureQuery {
+        width: wi,
+        height: hi,
+        ..
+    } = text_surf_tex.query();
+    can.copy(
+        &text_surf_tex,
+        Some(Rect::new(0, 0, wi, hi)),
+        Some(Rect::new(x, y, wi, hi)),
+    )
+    .expect("on font copy");
+}
 
 fn main() {
     let width = 1440;
@@ -22,6 +47,9 @@ fn main() {
         .build()
         .map_err(|e| e.to_string())
         .expect("Error on canvas");
+    let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string()).unwrap();
+    let font = ttf_context
+        .load_font("./font.ttf", 32).unwrap();
     let tc = can.texture_creator();
     let mut texture = tc
         .create_texture_streaming(PixelFormatEnum::RGB24, width, height)
@@ -47,7 +75,6 @@ fn main() {
 
         can.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
         can.clear();
-        //can.copy(&texture, None, Some(Rect::new(0, 0, width, height))).expect("on copy");
 
         for x in 0..TILE_W {
             for y in 0..TILE_H {
@@ -69,6 +96,17 @@ fn main() {
         let ypos = breakout.ball.y;
         can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 16, 16))
             .expect("on ball");
+
+        printtext(
+                &mut can,
+                &tc,
+                &font,
+                75,
+                75,
+                sdl2::pixels::Color::RGB(255, 255, 255),
+                &format!("Score: {}", breakout.score),
+            );
+
         can.present();
 
         let start = SystemTime::now();
