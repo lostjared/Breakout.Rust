@@ -139,7 +139,7 @@ pub mod breakout {
             self.dy = -BALL_SPEED;
         }
 
-        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, mut score: &mut u32) {
+        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, mut score: &mut u32, mut lives: &mut u32) {
             self.x += self.dx;
             self.y += self.dy;
 
@@ -158,6 +158,7 @@ pub mod breakout {
                 self.dy = -self.dy;
             } else if self.y + BALL_SIZE > SCREEN_HEIGHT {
                 std::thread::sleep(std::time::Duration::from_secs(1));
+                *lives -= 1;
                 self.reset();
             }
 
@@ -191,6 +192,7 @@ pub mod breakout {
         pub paddle: Paddle,
         pub ball: Ball,
         pub score: u32,
+        pub lives: u32,
         pub grid: Grid,
     }
 
@@ -200,16 +202,22 @@ pub mod breakout {
                 paddle: Paddle::new(SCREEN_WIDTH / 2 - PADDLE_WIDTH / 2, SCREEN_HEIGHT - 60),
                 ball: Ball::new(),
                 score: 0,
+                lives: 10,
                 grid: Grid::new(),
             }
         }
 
         pub fn new_game(&mut self) {
             self.grid.fill_rand();
+            self.score = 0;
+            self.lives = 10;
         }
 
         pub fn update(&mut self) {
-            self.ball.update(&self.paddle, &mut self.grid, &mut self.score);
+            self.ball.update(&self.paddle, &mut self.grid, &mut self.score, &mut self.lives);
+            if self.lives <= 0 {
+                self.new_game();
+            }
         }
     }
 }

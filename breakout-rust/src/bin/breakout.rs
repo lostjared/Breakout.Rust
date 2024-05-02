@@ -104,7 +104,7 @@ fn main() {
                 75,
                 75,
                 sdl2::pixels::Color::RGB(255, 255, 255),
-                &format!("Score: {}", breakout.score),
+                &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
             );
 
         can.present();
