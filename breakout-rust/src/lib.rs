@@ -1,9 +1,7 @@
 pub mod breakout {
     use rand::Rng;
     use sdl2::pixels::Color;
-    use sdl2::rect::Rect;
-    use sdl2::render::WindowCanvas;
-
+    
     pub const SCREEN_WIDTH: i32 = 1440;
     pub const SCREEN_HEIGHT: i32 = 1080;
     pub const TILE_W: usize = SCREEN_WIDTH as usize / 32;
@@ -52,8 +50,8 @@ pub mod breakout {
 
     impl Grid {
         pub fn new() -> Grid {
-            let blocks = Box::new([[Block { color_type: 0 }; TILE_H]; TILE_W]);
-            Grid { blocks }
+            let b= Box::new([[Block { color_type: 0 }; TILE_H]; TILE_W]);
+            Grid { blocks: b }
         }
 
         pub fn fill_rand(&mut self) {
@@ -119,12 +117,6 @@ pub mod breakout {
                 dx: BALL_SPEED,
                 dy: -BALL_SPEED,
             }
-        }
-
-        pub fn draw(&self, canvas: &mut WindowCanvas) {
-            let ball_rect = Rect::new(self.x, self.y, BALL_SIZE as u32, BALL_SIZE as u32);
-            canvas.set_draw_color(Color::RGB(255, 255, 255));
-            canvas.fill_rect(ball_rect).unwrap();
         }
 
         pub fn reset(&mut self) {
