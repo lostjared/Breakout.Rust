@@ -90,6 +90,17 @@ pub mod breakout {
         pub fn color_from_type(&self, b: &Block) -> sdl2::pixels::Color {
             return self.colors[b.color_type as usize];
         }
+
+        pub fn is_empty(&self) -> bool {
+            for x in 0..TILE_W {
+                for y in 0..TILE_H {
+                    if self.blocks[x][y].color_type != 0 {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 
     pub struct Ball {
@@ -212,6 +223,9 @@ pub mod breakout {
                 &mut self.lives,
             );
             if self.lives <= 0 {
+                self.new_game();
+            }
+            if self.grid.is_empty() {
                 self.new_game();
             }
         }
