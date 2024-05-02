@@ -215,7 +215,7 @@ pub mod breakout {
             self.lives = 10;
         }
 
-        pub fn update(&mut self) {
+        pub fn update(&mut self) -> bool {
             self.ball.update(
                 &self.paddle,
                 &mut self.grid,
@@ -224,10 +224,13 @@ pub mod breakout {
             );
             if self.lives <= 0 {
                 self.new_game();
+                return true;
             }
             if self.grid.is_empty() {
                 self.new_game();
+                return true;
             }
+            false
         }
     }
 }

@@ -125,7 +125,10 @@ fn main() {
             }
         } else if total_tick > 10 {
             total_tick  = 0;
-            breakout.update();
+            if breakout.update() {
+                intro = true;
+                total_tick = 0;
+            }
             
             let keyboard_state = e.keyboard_state();
             if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
