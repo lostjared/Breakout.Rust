@@ -10,7 +10,7 @@ fn main() {
     let height = 720;
     let sdl = sdl2::init().unwrap();
     let video = sdl.video().unwrap();
-    let window = video.window("App", width, height).resizable().opengl().build().unwrap();
+    let window = video.window("Breakout.Rust", width, height).resizable().opengl().build().unwrap();
     let mut can = window.into_canvas().build().map_err(|e| e.to_string()).expect("Error on canvas");
     let tc = can.texture_creator();
     let mut texture = tc.create_texture_streaming(PixelFormatEnum::RGB24, width, height).map_err(|e| e.to_string()).expect("Error on texture create");
