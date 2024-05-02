@@ -1,5 +1,4 @@
 use breakout_rust::breakout::*;
-use rand::Rng;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::pixels::PixelFormatEnum;
@@ -51,7 +50,7 @@ fn main() {
     let font = ttf_context
         .load_font("./font.ttf", 32).unwrap();
     let tc = can.texture_creator();
-    let mut texture = tc
+    let _texture = tc
         .create_texture_streaming(PixelFormatEnum::RGB24, width, height)
         .map_err(|e| e.to_string())
         .expect("Error on texture create");

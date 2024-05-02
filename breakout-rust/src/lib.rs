@@ -139,7 +139,7 @@ pub mod breakout {
             self.dy = -BALL_SPEED;
         }
 
-        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, mut score: &mut u32, mut lives: &mut u32) {
+        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, score: &mut u32, lives: &mut u32) {
             self.x += self.dx;
             self.y += self.dy;
 
