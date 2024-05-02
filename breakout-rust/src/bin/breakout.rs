@@ -47,8 +47,7 @@ fn main() {
         .map_err(|e| e.to_string())
         .expect("Error on canvas");
     let ttf_context = sdl2::ttf::init().map_err(|e| e.to_string()).unwrap();
-    let font = ttf_context
-        .load_font("./font.ttf", 32).unwrap();
+    let font = ttf_context.load_font("./font.ttf", 32).unwrap();
     let tc = can.texture_creator();
     let _texture = tc
         .create_texture_streaming(PixelFormatEnum::RGB24, width, height)
@@ -79,7 +78,7 @@ fn main() {
             for y in 0..TILE_H {
                 let xpos = x * 32;
                 let ypos = y * 16;
-                let color = Grid::color_from_type(&breakout.grid.blocks[x][y]);
+                let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
                 can.set_draw_color(color);
                 can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
                     .expect("draw rect");
@@ -97,14 +96,14 @@ fn main() {
             .expect("on ball");
 
         printtext(
-                &mut can,
-                &tc,
-                &font,
-                75,
-                75,
-                sdl2::pixels::Color::RGB(255, 255, 255),
-                &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
-            );
+            &mut can,
+            &tc,
+            &font,
+            75,
+            75,
+            sdl2::pixels::Color::RGB(255, 255, 255),
+            &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
+        );
 
         can.present();
 

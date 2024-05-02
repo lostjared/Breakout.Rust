@@ -1,7 +1,7 @@
 pub mod breakout {
     use rand::Rng;
     use sdl2::pixels::Color;
-    
+
     pub const SCREEN_WIDTH: i32 = 1440;
     pub const SCREEN_HEIGHT: i32 = 1080;
     pub const TILE_W: usize = SCREEN_WIDTH as usize / 32;
@@ -46,12 +46,31 @@ pub mod breakout {
 
     pub struct Grid {
         pub blocks: Box<[[Block; TILE_H]; TILE_W]>,
+        pub colors: Vec<Color>,
     }
 
     impl Grid {
         pub fn new() -> Grid {
-            let b= Box::new([[Block { color_type: 0 }; TILE_H]; TILE_W]);
-            Grid { blocks: b }
+            let b = Box::new([[Block { color_type: 0 }; TILE_H]; TILE_W]);
+            let v = Grid::rand_colors();
+            Grid {
+                blocks: b,
+                colors: v,
+            }
+        }
+
+        pub fn rand_colors() -> Vec<Color> {
+            let mut v: Vec<Color> = Vec::new();
+            let mut rng = rand::thread_rng();
+            v.push(Color::RGB(0, 0, 0));
+            for _i in 0..10 {
+                v.push(Color::RGB(
+                    rng.gen_range(0..255),
+                    rng.gen_range(0..255),
+                    rng.gen_range(0..255),
+                ));
+            }
+            v
         }
 
         pub fn fill_rand(&mut self) {
@@ -61,44 +80,15 @@ pub mod breakout {
                     block.color_type = rng.gen_range(1..8);
                 }
             }
+            self.reset_colors();
         }
 
-        pub fn color_from_type(b: &Block) -> sdl2::pixels::Color {
-            match b.color_type {
-                1 => {
-                    return sdl2::pixels::Color::RGB(255, 0, 0);
-                }
+        pub fn reset_colors(&mut self) {
+            self.colors = Grid::rand_colors();
+        }
 
-                2 => {
-                    return sdl2::pixels::Color::RGB(255, 255, 0);
-                }
-
-                3 => {
-                    return sdl2::pixels::Color::RGB(255, 0, 25);
-                }
-
-                4 => {
-                    return sdl2::pixels::Color::RGB(255, 255, 255);
-                }
-
-                5 => {
-                    return sdl2::pixels::Color::RGB(255, 100, 50);
-                }
-
-                6 => {
-                    return sdl2::pixels::Color::RGB(255, 200, 100);
-                }
-
-                7 => {
-                    return sdl2::pixels::Color::RGB(255, 75, 125);
-                }
-                8 => {
-                    return sdl2::pixels::Color::RGB(255, 60, 20);
-                }
-                _ => {
-                    return sdl2::pixels::Color::RGB(0, 0, 0);
-                }
-            }
+        pub fn color_from_type(&self, b: &Block) -> sdl2::pixels::Color {
+            return self.colors[b.color_type as usize];
         }
     }
 
@@ -131,7 +121,13 @@ pub mod breakout {
             self.dy = -BALL_SPEED;
         }
 
-        pub fn update(&mut self, paddle: &Paddle, grid: &mut Grid, score: &mut u32, lives: &mut u32) {
+        pub fn update(
+            &mut self,
+            paddle: &Paddle,
+            grid: &mut Grid,
+            score: &mut u32,
+            lives: &mut u32,
+        ) {
             self.x += self.dx;
             self.y += self.dy;
 
@@ -161,7 +157,9 @@ pub mod breakout {
 
             for col in 0..TILE_W {
                 for row in 0..TILE_H {
-                    if grid.blocks[col][row].color_type == 0 { continue; }
+                    if grid.blocks[col][row].color_type == 0 {
+                        continue;
+                    }
                     let block_x = col as i32 * 32;
                     let block_y = row as i32 * 16;
                     let block_right = block_x + 32;
@@ -174,6 +172,7 @@ pub mod breakout {
                         self.dy = -self.dy;
                         grid.blocks[col][row].color_type = 0;
                         *score += 10;
+                        grid.reset_colors();
                     }
                 }
             }
@@ -206,7 +205,12 @@ pub mod breakout {
         }
 
         pub fn update(&mut self) {
-            self.ball.update(&self.paddle, &mut self.grid, &mut self.score, &mut self.lives);
+            self.ball.update(
+                &self.paddle,
+                &mut self.grid,
+                &mut self.score,
+                &mut self.lives,
+            );
             if self.lives <= 0 {
                 self.new_game();
             }
