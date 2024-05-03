@@ -35,12 +35,16 @@ fn main() {
     let sdl = sdl2::init().unwrap();
     let timer_subsystem = sdl.timer().unwrap();
     let video = sdl.video().unwrap();
-    let window = video
+    let mut window = video
         .window("Breakout.Rust", width, height)
         .resizable()
         .opengl()
         .build()
         .unwrap();
+
+    let ico = sdl2::surface::Surface::load_bmp("./img/icon.bmp").unwrap();
+    window.set_icon(ico);
+
     let mut can = window
         .into_canvas()
         .build()
