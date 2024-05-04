@@ -1,7 +1,6 @@
 /// Breakout Arcade Style Demo
 /// written by Jared Bruni (https://lostsidedead.biz)
 /// GPLv3 see LICENSE file for more information.
-
 use breakout_rust::breakout::*;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
