@@ -70,11 +70,12 @@ fn main() {
     let intro_texture = tc.create_texture_from_surface(intro_surface).unwrap();
     let start_surface = sdl2::surface::Surface::load_bmp("./img/start.bmp").unwrap();
     let start_texture = tc.create_texture_from_surface(start_surface).unwrap();
+    let gameover_surface = sdl2::surface::Surface::load_bmp("./img/game_over.bmp").unwrap();
+    let gameover_texture = tc.create_texture_from_surface(gameover_surface).unwrap();
     let mut breakout = Breakout::new();
     breakout.new_game();
     let mut ticks = timer_subsystem.ticks();
     let mut total_tick: u32 = 0;
-    let mut intro = true;
     let mut screen: Screen = Screen::Intro;
 
     'main: loop {
@@ -85,10 +86,20 @@ fn main() {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'main,
-                Event::KeyDown { keycode: Some(Keycode::Return),
-                .. } => {
+                Event::KeyDown {
+                    keycode: Some(Keycode::Return),
+                    ..
+                } => {
                     if screen == Screen::Start {
                         screen = Screen::Game;
+                    }
+                }
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    ..
+                } => {
+                    if screen == Screen::GameOver {
+                        screen = Screen::Intro;
                     }
                 }
                 _ => {}
@@ -108,16 +119,17 @@ fn main() {
                 can.copy(&intro_texture, None, None).expect("on copy");
             }
             Screen::Start => {
-                can.copy(&start_texture, None, None).expect("on copy texture");
+                can.copy(&start_texture, None, None)
+                    .expect("on copy texture");
                 printtext(
                     &mut can,
                     &tc,
                     &font,
-                    1440/2-130,
-                    1080/2-50,
+                    1440 / 2 - 130,
+                    1080 / 2 - 50,
                     sdl2::pixels::Color::RGB(255, 255, 255),
-                    "Press Enter to Start");
-                
+                    "Press Enter to Start",
+                );
             }
             Screen::Game => {
                 for x in 0..TILE_W {
@@ -151,7 +163,19 @@ fn main() {
                     &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
                 );
             }
-            Screen::GameOver => {}
+            Screen::GameOver => {
+                can.copy(&gameover_texture, None, None)
+                    .expect("on copy surface");
+                printtext(
+                    &mut can,
+                    &tc,
+                    &font,
+                    1440 / 2 - 200,
+                    1080 / 2 - 50,
+                    sdl2::pixels::Color::RGB(255, 255, 255),
+                    "Press Space to Start Over",
+                );
+            }
         }
         can.present();
 
@@ -162,14 +186,12 @@ fn main() {
                     screen = Screen::Start;
                 }
             }
-            Screen::Start => {
-            
-            }
+            Screen::Start => {}
             Screen::Game => {
                 if total_tick > 10 {
                     total_tick = 0;
                     if breakout.update() {
-                        intro = true;
+                        screen = Screen::GameOver;
                         total_tick = 0;
                     }
 
@@ -186,4 +208,3 @@ fn main() {
         }
     }
 }
-
