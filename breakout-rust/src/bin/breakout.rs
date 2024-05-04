@@ -29,6 +29,14 @@ fn printtext(
     .expect("on font copy");
 }
 
+#[derive(PartialEq)]
+enum Screen {
+    Intro,
+    Start,
+    Game,
+    GameOver,
+}
+
 fn main() {
     let width = 1440;
     let height = 1080;
@@ -60,11 +68,15 @@ fn main() {
     let mut e = sdl.event_pump().unwrap();
     let intro_surface = sdl2::surface::Surface::load_bmp("./img/logo.bmp").unwrap();
     let intro_texture = tc.create_texture_from_surface(intro_surface).unwrap();
+    let start_surface = sdl2::surface::Surface::load_bmp("./img/start.bmp").unwrap();
+    let start_texture = tc.create_texture_from_surface(start_surface).unwrap();
     let mut breakout = Breakout::new();
     breakout.new_game();
     let mut ticks = timer_subsystem.ticks();
     let mut total_tick: u32 = 0;
     let mut intro = true;
+    let mut screen: Screen = Screen::Intro;
+
     'main: loop {
         for _event in e.poll_iter() {
             match _event {
@@ -73,6 +85,12 @@ fn main() {
                     keycode: Some(Keycode::Escape),
                     ..
                 } => break 'main,
+                Event::KeyDown { keycode: Some(Keycode::Return),
+                .. } => {
+                    if screen == Screen::Start {
+                        screen = Screen::Game;
+                    }
+                }
                 _ => {}
             }
         }
@@ -80,67 +98,92 @@ fn main() {
         can.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
         can.clear();
 
-
         let tick = timer_subsystem.ticks();
-        let tick_diff = tick-ticks;
+        let tick_diff = tick - ticks;
         ticks = tick;
         total_tick += tick_diff;
 
-        if intro {
-            can.copy(&intro_texture, None, None).expect("on copy");
-        } else {
-            for x in 0..TILE_W {
-                for y in 0..TILE_H {
-                    let xpos = x * 32;
-                    let ypos = y * 16;
-                    let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
-                    can.set_draw_color(color);
-                    can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
-                        .expect("draw rect");
+        match screen {
+            Screen::Intro => {
+                can.copy(&intro_texture, None, None).expect("on copy");
+            }
+            Screen::Start => {
+                can.copy(&start_texture, None, None).expect("on copy texture");
+                printtext(
+                    &mut can,
+                    &tc,
+                    &font,
+                    1440/2-130,
+                    1080/2-50,
+                    sdl2::pixels::Color::RGB(255, 255, 255),
+                    "Press Enter to Start");
+                
+            }
+            Screen::Game => {
+                for x in 0..TILE_W {
+                    for y in 0..TILE_H {
+                        let xpos = x * 32;
+                        let ypos = y * 16;
+                        let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
+                        can.set_draw_color(color);
+                        can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
+                            .expect("draw rect");
+                    }
+                }
+
+                let xpos = breakout.paddle.x;
+                let ypos = breakout.paddle.y;
+                can.set_draw_color(breakout.paddle.color);
+                can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 200, 20))
+                    .expect("on fill");
+                let xpos = breakout.ball.x;
+                let ypos = breakout.ball.y;
+                can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 16, 16))
+                    .expect("on ball");
+
+                printtext(
+                    &mut can,
+                    &tc,
+                    &font,
+                    75,
+                    75,
+                    sdl2::pixels::Color::RGB(255, 255, 255),
+                    &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
+                );
+            }
+            Screen::GameOver => {}
+        }
+        can.present();
+
+        match screen {
+            Screen::Intro => {
+                if total_tick > 2500 {
+                    total_tick = 0;
+                    screen = Screen::Start;
                 }
             }
-
-            let xpos = breakout.paddle.x;
-            let ypos = breakout.paddle.y;
-            can.set_draw_color(breakout.paddle.color);
-            can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 200, 20))
-                .expect("on fill");
-            let xpos = breakout.ball.x;
-            let ypos = breakout.ball.y;
-            can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 16, 16))
-                .expect("on ball");
-
-            printtext(
-                &mut can,
-                &tc,
-                &font,
-                75,
-                75,
-                sdl2::pixels::Color::RGB(255, 255, 255),
-                &format!("Lives: {} Score: {}", breakout.lives, breakout.score),
-            );
-        }
-        can.present();       
-
-        if intro {
-            if total_tick > 2500 {
-                total_tick = 0;
-                intro = false;
-            }
-        } else if total_tick > 10 {
-            total_tick  = 0;
-            if breakout.update() {
-                intro = true;
-                total_tick = 0;
-            }
+            Screen::Start => {
             
-            let keyboard_state = e.keyboard_state();
-            if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
-                breakout.paddle.move_left();
             }
-            if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
-                breakout.paddle.move_right();
+            Screen::Game => {
+                if total_tick > 10 {
+                    total_tick = 0;
+                    if breakout.update() {
+                        intro = true;
+                        total_tick = 0;
+                    }
+
+                    let keyboard_state = e.keyboard_state();
+                    if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Left) {
+                        breakout.paddle.move_left();
+                    }
+                    if keyboard_state.is_scancode_pressed(sdl2::keyboard::Scancode::Right) {
+                        breakout.paddle.move_right();
+                    }
+                }
             }
+            Screen::GameOver => {}
         }
     }
 }
+
