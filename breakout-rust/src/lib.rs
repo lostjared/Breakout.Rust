@@ -1,3 +1,7 @@
+/// Breakout Arcade Style Demo
+/// written by Jared Bruni (https://lostsidedead.biz)
+/// GPLv3 see LICENSE file for more information.
+
 pub mod breakout {
     use rand::Rng;
     use sdl2::pixels::Color;
