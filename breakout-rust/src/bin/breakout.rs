@@ -100,6 +100,7 @@ fn main() {
                 } => {
                     if screen == Screen::GameOver {
                         screen = Screen::Intro;
+                        total_tick = 0;
                     }
                 }
                 _ => {}
