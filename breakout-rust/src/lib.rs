@@ -53,6 +53,12 @@ pub mod breakout {
         pub colors: Vec<Color>,
     }
 
+    impl Default for Grid {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl Grid {
         pub fn new() -> Grid {
             let b = Box::new([[Block { color_type: 0 }; TILE_H]; TILE_W]);
@@ -92,7 +98,7 @@ pub mod breakout {
         }
 
         pub fn color_from_type(&self, b: &Block) -> sdl2::pixels::Color {
-            return self.colors[b.color_type as usize];
+            self.colors[b.color_type as usize]
         }
 
         pub fn is_empty(&self) -> bool {
@@ -103,7 +109,7 @@ pub mod breakout {
                     }
                 }
             }
-            return true;
+            true
         }
     }
 
@@ -112,6 +118,12 @@ pub mod breakout {
         pub y: i32,
         pub dx: i32,
         pub dy: i32,
+    }
+
+    impl Default for Ball {
+        fn default() -> Self {
+            Self::new()
+        }
     }
 
     impl Ball {
@@ -202,6 +214,12 @@ pub mod breakout {
         pub grid: Grid,
     }
 
+    impl Default for Breakout {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl Breakout {
         pub fn new() -> Self {
             Breakout {
@@ -226,7 +244,7 @@ pub mod breakout {
                 &mut self.score,
                 &mut self.lives,
             );
-            if self.lives <= 0 {
+            if self.lives == 0 {
                 self.new_game();
                 return true;
             }
