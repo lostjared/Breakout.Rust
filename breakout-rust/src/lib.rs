@@ -130,7 +130,7 @@ pub mod breakout {
         pub fn new() -> Ball {
             Ball {
                 x: SCREEN_WIDTH / 2,
-                y: SCREEN_HEIGHT / 2,
+                y: SCREEN_HEIGHT / 2 + 100,
                 dx: BALL_SPEED,
                 dy: -BALL_SPEED,
             }
@@ -138,7 +138,7 @@ pub mod breakout {
 
         pub fn reset(&mut self) {
             self.x = SCREEN_WIDTH / 2;
-            self.y = SCREEN_HEIGHT / 2 - 50;
+            self.y = SCREEN_HEIGHT / 2 + 100;
             let mut rng = rand::thread_rng();
             self.dx = if rng.gen::<bool>() {
                 BALL_SPEED
