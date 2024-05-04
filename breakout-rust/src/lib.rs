@@ -204,7 +204,7 @@ pub mod breakout {
                 paddle: Paddle::new(SCREEN_WIDTH / 2 - PADDLE_WIDTH / 2, SCREEN_HEIGHT - 60),
                 ball: Ball::new(),
                 score: 0,
-                lives: 10,
+                lives: 5,
                 grid: Grid::new(),
             }
         }
@@ -212,7 +212,7 @@ pub mod breakout {
         pub fn new_game(&mut self) {
             self.grid.fill_rand();
             self.score = 0;
-            self.lives = 10;
+            self.lives = 5;
         }
 
         pub fn update(&mut self) -> bool {
