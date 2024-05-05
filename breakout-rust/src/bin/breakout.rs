@@ -40,12 +40,14 @@ enum Screen {
     GameOver,
 }
 
-fn load_gfx(tc: &sdl2::render::TextureCreator<sdl2::video::WindowContext>) -> Vec<sdl2::render::Texture> {
+fn load_gfx(
+    tc: &sdl2::render::TextureCreator<sdl2::video::WindowContext>,
+) -> Vec<sdl2::render::Texture> {
     let paths = vec!["./img/logo.bmp", "./img/start.bmp", "./img/game_over.bmp"];
-    let mut images : Vec<sdl2::render::Texture> = Vec::new();
+    let mut images: Vec<sdl2::render::Texture> = Vec::new();
     for i in paths {
         let surf = sdl2::surface::Surface::load_bmp(i).unwrap();
-        let tex =  tc.create_texture_from_surface(surf).unwrap();
+        let tex = tc.create_texture_from_surface(surf).unwrap();
         images.push(tex);
     }
     images
@@ -129,8 +131,7 @@ fn main() {
                 can.copy(&images[0], None, None).expect("on copy");
             }
             Screen::Start => {
-                can.copy(&images[1], None, None)
-                    .expect("on copy texture");
+                can.copy(&images[1], None, None).expect("on copy texture");
                 printtext(
                     &mut can,
                     &tc,
@@ -174,8 +175,7 @@ fn main() {
                 );
             }
             Screen::GameOver => {
-                can.copy(&images[2], None, None)
-                    .expect("on copy surface");
+                can.copy(&images[2], None, None).expect("on copy surface");
                 printtext(
                     &mut can,
                     &tc,
