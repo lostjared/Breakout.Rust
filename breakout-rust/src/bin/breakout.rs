@@ -40,6 +40,17 @@ enum Screen {
     GameOver,
 }
 
+fn load_gfx(tc: &sdl2::render::TextureCreator<sdl2::video::WindowContext>) -> Vec<sdl2::render::Texture> {
+    let paths = vec!["./img/logo.bmp", "./img/start.bmp", "./img/game_over.bmp"];
+    let mut images : Vec<sdl2::render::Texture> = Vec::new();
+    for i in paths {
+        let surf = sdl2::surface::Surface::load_bmp(i).unwrap();
+        let tex =  tc.create_texture_from_surface(surf).unwrap();
+        images.push(tex);
+    }
+    images
+}
+
 fn main() {
     let width = 1440;
     let height = 1080;
@@ -69,12 +80,7 @@ fn main() {
         .map_err(|e| e.to_string())
         .expect("Error on texture create");
     let mut e = sdl.event_pump().unwrap();
-    let intro_surface = sdl2::surface::Surface::load_bmp("./img/logo.bmp").unwrap();
-    let intro_texture = tc.create_texture_from_surface(intro_surface).unwrap();
-    let start_surface = sdl2::surface::Surface::load_bmp("./img/start.bmp").unwrap();
-    let start_texture = tc.create_texture_from_surface(start_surface).unwrap();
-    let gameover_surface = sdl2::surface::Surface::load_bmp("./img/game_over.bmp").unwrap();
-    let gameover_texture = tc.create_texture_from_surface(gameover_surface).unwrap();
+    let images = load_gfx(&tc);
     let mut breakout = Breakout::new();
     breakout.new_game();
     let mut ticks = timer_subsystem.ticks();
@@ -120,10 +126,10 @@ fn main() {
 
         match screen {
             Screen::Intro => {
-                can.copy(&intro_texture, None, None).expect("on copy");
+                can.copy(&images[0], None, None).expect("on copy");
             }
             Screen::Start => {
-                can.copy(&start_texture, None, None)
+                can.copy(&images[1], None, None)
                     .expect("on copy texture");
                 printtext(
                     &mut can,
@@ -168,7 +174,7 @@ fn main() {
                 );
             }
             Screen::GameOver => {
-                can.copy(&gameover_texture, None, None)
+                can.copy(&images[2], None, None)
                     .expect("on copy surface");
                 printtext(
                     &mut can,
