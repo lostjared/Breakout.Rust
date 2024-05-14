@@ -61,7 +61,6 @@ fn main() {
     let video = sdl.video().unwrap();
     let mut window = video
         .window("Breakout.Rust", width, height)
-        .resizable()
         .opengl()
         .build()
         .unwrap();
