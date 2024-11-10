@@ -40,19 +40,6 @@ enum Screen {
     GameOver,
 }
 
-fn load_gfx(
-    tc: &sdl2::render::TextureCreator<sdl2::video::WindowContext>,
-) -> Vec<sdl2::render::Texture> {
-    let paths = vec!["./img/logo.bmp", "./img/start.bmp", "./img/game_over.bmp"];
-    let mut images: Vec<sdl2::render::Texture> = Vec::new();
-    for i in paths {
-        let surf = sdl2::surface::Surface::load_bmp(i).unwrap();
-        let tex = tc.create_texture_from_surface(surf).unwrap();
-        images.push(tex);
-    }
-    images
-}
-
 fn main() {
     let width = 1440;
     let height = 1080;
@@ -61,6 +48,7 @@ fn main() {
     let video = sdl.video().unwrap();
     let mut window = video
         .window("Breakout.Rust", width, height)
+        .resizable()
         .opengl()
         .build()
         .unwrap();
@@ -81,7 +69,15 @@ fn main() {
         .map_err(|e| e.to_string())
         .expect("Error on texture create");
     let mut e = sdl.event_pump().unwrap();
-    let images = load_gfx(&tc);
+    let intro_surface = sdl2::surface::Surface::load_bmp("./img/logo.bmp").unwrap();
+    let intro_texture = tc.create_texture_from_surface(intro_surface).unwrap();
+    let start_surface = sdl2::surface::Surface::load_bmp("./img/start.bmp").unwrap();
+    let start_texture = tc.create_texture_from_surface(start_surface).unwrap();
+    let gameover_surface = sdl2::surface::Surface::load_bmp("./img/game_over.bmp").unwrap();
+    let gameover_texture = tc.create_texture_from_surface(gameover_surface).unwrap();
+    let game_surface = sdl2::surface::Surface::load_bmp("./img/bg.bmp").unwrap();
+    let game_texture = tc.create_texture_from_surface(game_surface).unwrap();
+
     let mut breakout = Breakout::new();
     breakout.new_game();
     let mut ticks = timer_subsystem.ticks();
@@ -127,10 +123,11 @@ fn main() {
 
         match screen {
             Screen::Intro => {
-                can.copy(&images[0], None, None).expect("on copy");
+                can.copy(&intro_texture, None, None).expect("on copy");
             }
             Screen::Start => {
-                can.copy(&images[1], None, None).expect("on copy texture");
+                can.copy(&start_texture, None, None)
+                    .expect("on copy texture");
                 printtext(
                     &mut can,
                     &tc,
@@ -142,14 +139,23 @@ fn main() {
                 );
             }
             Screen::Game => {
+                can.copy(&game_texture, None, None)
+                .expect("on copy texture");
                 for x in 0..TILE_W {
                     for y in 0..TILE_H {
                         let xpos = x * 32;
                         let ypos = y * 16;
-                        let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
-                        can.set_draw_color(color);
-                        can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
-                            .expect("draw rect");
+                        if breakout.grid.blocks[x][y].color_type != 0 {
+                            can.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
+                            can.fill_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16)).expect("fill rect");
+
+                            let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
+
+
+                            can.set_draw_color(color);
+                            can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
+                                .expect("draw rect");
+                        }
                     }
                 }
 
@@ -174,7 +180,8 @@ fn main() {
                 );
             }
             Screen::GameOver => {
-                can.copy(&images[2], None, None).expect("on copy surface");
+                can.copy(&gameover_texture, None, None)
+                    .expect("on copy surface");
                 printtext(
                     &mut can,
                     &tc,
