@@ -140,17 +140,17 @@ fn main() {
             }
             Screen::Game => {
                 can.copy(&game_texture, None, None)
-                .expect("on copy texture");
+                    .expect("on copy texture");
                 for x in 0..TILE_W {
                     for y in 0..TILE_H {
                         let xpos = x * 32;
                         let ypos = y * 16;
                         if breakout.grid.blocks[x][y].color_type != 0 {
                             can.set_draw_color(sdl2::pixels::Color::RGB(0, 0, 0));
-                            can.fill_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16)).expect("fill rect");
+                            can.fill_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
+                                .expect("fill rect");
 
                             let color = breakout.grid.color_from_type(&breakout.grid.blocks[x][y]);
-
 
                             can.set_draw_color(color);
                             can.draw_rect(sdl2::rect::Rect::new(xpos as i32, ypos as i32, 32, 16))
@@ -166,20 +166,19 @@ fn main() {
                 let start_color = (150, 150, 150);
                 let end_color = (200, 200, 200);
                 let gradient_steps = paddle_height;
-                
+
                 for i in 0..gradient_steps {
                     let factor = i as f32 / (gradient_steps as f32);
-                    let r = start_color.0 as f32 + factor * (end_color.0 as f32 - start_color.0 as f32);
-                    let g = start_color.1 as f32 + factor * (end_color.1 as f32 - start_color.1 as f32);
-                    let b = start_color.2 as f32 + factor * (end_color.2 as f32 - start_color.2 as f32);
-                
+                    let r =
+                        start_color.0 as f32 + factor * (end_color.0 as f32 - start_color.0 as f32);
+                    let g =
+                        start_color.1 as f32 + factor * (end_color.1 as f32 - start_color.1 as f32);
+                    let b =
+                        start_color.2 as f32 + factor * (end_color.2 as f32 - start_color.2 as f32);
+
                     can.set_draw_color((r as u8, g as u8, b as u8));
-                    can.fill_rect(sdl2::rect::Rect::new(
-                        xpos,
-                        ypos + i,
-                        paddle_width,
-                        1,
-                    )).expect("Failed to fill rect for gradient");
+                    can.fill_rect(sdl2::rect::Rect::new(xpos, ypos + i, paddle_width, 1))
+                        .expect("Failed to fill rect for gradient");
                 }
 
                 let xpos = breakout.ball.x;
