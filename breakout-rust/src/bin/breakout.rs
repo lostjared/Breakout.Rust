@@ -161,9 +161,27 @@ fn main() {
 
                 let xpos = breakout.paddle.x;
                 let ypos = breakout.paddle.y;
-                can.set_draw_color(breakout.paddle.color);
-                can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 200, 20))
-                    .expect("on fill");
+                let paddle_width = 200;
+                let paddle_height = 20;
+                let start_color = (150, 150, 150);
+                let end_color = (200, 200, 200);
+                let gradient_steps = paddle_height;
+                
+                for i in 0..gradient_steps {
+                    let factor = i as f32 / (gradient_steps as f32);
+                    let r = start_color.0 as f32 + factor * (end_color.0 as f32 - start_color.0 as f32);
+                    let g = start_color.1 as f32 + factor * (end_color.1 as f32 - start_color.1 as f32);
+                    let b = start_color.2 as f32 + factor * (end_color.2 as f32 - start_color.2 as f32);
+                
+                    can.set_draw_color((r as u8, g as u8, b as u8));
+                    can.fill_rect(sdl2::rect::Rect::new(
+                        xpos,
+                        ypos + i,
+                        paddle_width,
+                        1,
+                    )).expect("Failed to fill rect for gradient");
+                }
+
                 let xpos = breakout.ball.x;
                 let ypos = breakout.ball.y;
                 can.fill_rect(sdl2::rect::Rect::new(xpos, ypos, 16, 16))
